@@ -8,15 +8,17 @@ This project is a full-stack Employee Management System built with:
 	•	Frontend: React.js with Material UI
 	•	Authentication: JWT (Signup / Login / Logout)
 	•	Employee Module: Full CRUD operations, search by department/position, profile image upload, data validation
-	•	Deployment: (Add Render/Vercel/Docker link when completed)
+	•	Deployment:
+	•	Frontend (Vercel): https://101488042-comp-3123-assignment2-7pbu1l42f.vercel.app
+	•	Backend (Render): https://one01488042-comp3123-assignment2.onrender.com
 
-The application provides secure user authentication and a professional UI for managing employees — including adding, editing, deleting, listing, and searching by department or position.
+The application provides secure authentication and a professional UI for managing employees — including adding, editing, deleting, listing, and searching employees.
 
 ⸻
 
- Test User Account (for Login)
+Test User Account (for Login)
 
-You may use the following account to test the login process:
+You can use the following account to test the login process:
 
 Email: lily@example.com
 Password: 123456
