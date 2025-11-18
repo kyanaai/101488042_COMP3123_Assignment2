@@ -144,7 +144,7 @@ function EmployeesPage() {
                       <TableCell>
                         {emp.profile_image_url ? (
                           <img
-                            src={emp.profile_image_url}
+                            src={`http://127.0.0.1:8081${emp.profile_image_url}`}
                             alt={`${emp.first_name} ${emp.last_name}`}
                             style={{
                               width: 40,

@@ -43,36 +43,31 @@ export default function AddEmployeeDialog({ open, onClose }) {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-
-  const readFileAsDataUrl = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result); // e.g. "data:image/png;base64,...."
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
-
   const mutation = useMutation({
     // We pass { form, file } from handleSubmit
     mutationFn: async ({ form, file }) => {
-      let profileImageString = undefined;
+      const formData = new FormData();
 
+      // append text fields
+      Object.entries(form).forEach(([key, val]) => {
+        formData.append(key, val);
+      });
+
+      // append file if selected, under key "profile_image"
       if (file) {
-        profileImageString = await readFileAsDataUrl(file);
+        formData.append("profile_image", file);
       }
 
-      const payload = {
-        ...form,
-        salary: Number(form.salary),
-        // backend expects profile_image in req.body
-        profile_image: profileImageString
-      };
+      const res = await api.post("/emp/employees", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
 
-      const res = await api.post("/emp/employees", payload);
       return res.data;
     },
     onSuccess: () => {
+      // refresh employees list
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       onClose();
     },

@@ -59,7 +59,7 @@ export const searchEmployees = async (req, res) => {
 
   const filter = {};
   if (department) {
-  filter.department = { $regex: department, $options: "i" };
+    filter.department = { $regex: department, $options: "i" };
   }
 
   if (position) {
@@ -84,16 +84,36 @@ export const searchEmployees = async (req, res) => {
 };
 
 // POST /api/v1/emp/employees
-// profile_image is an optional base64 string in req.body
+// profile_image is an optional uploaded file -> profile_image_url stored in DB
 export const createEmployee = async (req, res) => {
   const payload = { ...req.body };
+
+  // salary comes as string from frontend
+  if (payload.salary) {
+    payload.salary = Number(payload.salary);
+  }
+
+  // if a file was uploaded by Multer, set the URL
+  if (req.file) {
+    payload.profile_image_url = `/uploads/${req.file.filename}`;
+  }
 
   const emp = await Employee.create(payload);
 
   return res.status(201).json({
     status: true,
     message: "Employee created successfully.",
-    employee: emp
+    employee: {
+      employee_id: emp._id.toString(),
+      first_name: emp.first_name,
+      last_name: emp.last_name,
+      email: emp.email,
+      position: emp.position,
+      salary: emp.salary,
+      date_of_joining: emp.date_of_joining,
+      department: emp.department,
+      profile_image_url: emp.profile_image_url || null
+    }
   });
 };
 
@@ -102,7 +122,9 @@ export const getEmployee = async (req, res) => {
   const { eid } = req.params;
   const emp = await Employee.findById(eid).select("-__v");
   if (!emp)
-    return res.status(404).json({ status: false, message: "Employee not found" });
+    return res
+      .status(404)
+      .json({ status: false, message: "Employee not found" });
 
   return res.status(200).json({
     employee_id: emp._id.toString(),
@@ -122,14 +144,35 @@ export const updateEmployee = async (req, res) => {
   const { eid } = req.params;
   const payload = { ...req.body };
 
+  if (payload.salary) {
+    payload.salary = Number(payload.salary);
+  }
+
+  // if user uploads a new file during edit, update the URL
+  if (req.file) {
+    payload.profile_image_url = `/uploads/${req.file.filename}`;
+  }
+
   const updated = await Employee.findByIdAndUpdate(eid, payload, { new: true });
   if (!updated)
-    return res.status(404).json({ status: false, message: "Employee not found" });
+    return res
+      .status(404)
+      .json({ status: false, message: "Employee not found" });
 
   return res.status(200).json({
     status: true,
     message: "Employee details updated successfully.",
-    employee: updated
+    employee: {
+      employee_id: updated._id.toString(),
+      first_name: updated.first_name,
+      last_name: updated.last_name,
+      email: updated.email,
+      position: updated.position,
+      salary: updated.salary,
+      date_of_joining: updated.date_of_joining,
+      department: updated.department,
+      profile_image_url: updated.profile_image_url || null
+    }
   });
 };
 
@@ -138,7 +181,11 @@ export const deleteEmployee = async (req, res) => {
   const { eid } = req.query;
   const del = await Employee.findByIdAndDelete(eid);
   if (!del)
-    return res.status(404).json({ status: false, message: "Employee not found" });
+    return res
+      .status(404)
+      .json({ status: false, message: "Employee not found" });
 
-  return res.status(200).json({ status: true, message: "Employee deleted successfully." });
+  return res
+    .status(200)
+    .json({ status: true, message: "Employee deleted successfully." });
 };
